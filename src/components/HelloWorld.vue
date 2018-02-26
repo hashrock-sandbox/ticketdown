@@ -1,58 +1,106 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://github.com/vuejs/vue-cli/tree/dev/docs" target="_blank">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-typescript" target="_blank">typescript</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org/en/essentials/getting-started.html" target="_blank">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org/en/intro.html" target="_blank">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org/en" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+    <div>
+      ticketdown - prototype
+    </div>
+    <textarea class="editor" v-model="source"></textarea>
+    <textarea class="editor" v-model="output"></textarea>
+    <div>
+      <select v-model="mode">
+        <option>calendar</option>
+        <option>gantt</option>
+        <option>issue</option>
+        <option>board</option>
+      </select>
+    </div>
+
+    <div v-if="mode === 'calendar'">
+      <h1>予定</h1>
+      <div v-for="(ticket, idx) in tickets" :key="idx">
+        {{ticket.start_at}} {{ticket.name}}
+      </div>
+    </div>
+    <div v-if="mode === 'gantt'">
+      <svg width="300" height="300">
+        <rect x=0 y=0 width=100 height=100></rect>
+      </svg>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue from "vue";
+
+interface Ticket {
+  name: string;
+  start_at: string;
+  end_at: string;
+  alarm_at: string;
+  user: string;
+  tags: string[];
+  //  children: ticket[]
+  //  status: 'open' | 'closed' attribute
+  attributes: { [key: string]: string };
+}
+
+function parseLine(src: string): Ticket {
+  const items = src.split(" ");
+  const user = items.find(i => !!i.match(/^👤.*/g));
+  const alarmAt = items.find(i => !!i.match(/^⏰.*/g));
+
+  return {
+    name: items[0],
+    start_at: items[1],
+    end_at: items[2],
+    alarm_at: alarmAt ? alarmAt.replace(/⏰/g, "") : "",
+    user: user ? user.replace(/👤/g, "") : "",
+    tags: [],
+    attributes: {}
+  };
+}
+
+function parseLines(src: string): Ticket[] {
+  return src.split("\n").map(parseLine);
+}
+
+let source = `タスク1 2018-01-01 2018-01-03 👤yamada ⏰2018-01-02
+タスク2 2018-01-02 2018-01-05
+マイルストーン 2018-01-05
+`;
 
 export default Vue.extend({
-  name: 'HelloWorld',
+  name: "HelloWorld",
   props: {
-    msg: String,
+    msg: String
   },
+  data() {
+    return {
+      source: source,
+      mode: "calendar"
+    };
+  },
+  computed: {
+    tickets(): Ticket[] {
+      return parseLines(this.source);
+    },
+    output(): string {
+      return JSON.stringify(parseLines(this.source), null, 2);
+    }
+  }
 });
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.editor {
+  width: 100%;
+  height: 10rem;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+body {
+  background: #999;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+.hello {
+  margin: 1rem;
+  padding: 1rem;
+  background: white;
 }
 </style>
