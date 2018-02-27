@@ -25,30 +25,7 @@ import "codemirror/mode/markdown/markdown";
 import ViewCalendar from "./ViewCalendar.vue";
 import ViewIssue from "./ViewIssue.vue";
 import ViewGantt from "./ViewGantt.vue";
-import { Ticket } from "./data";
-
-function parseLine(src: string): Ticket {
-  const items = src.split(" ");
-  const user = items.find((i: string) => !!i.match(/^👤.*/g));
-  const alarmAt = items.find((i: string) => !!i.match(/^⏰.*/g));
-  const tags = items
-    .filter((i: string) => !!i.match(/^#.*/g))
-    .map((i: string) => i.replace(/#/g, ""));
-
-  return {
-    name: items[0],
-    start_at: items[1],
-    end_at: items[2],
-    alarm_at: alarmAt ? alarmAt.replace(/⏰/g, "") : "",
-    user: user ? user.replace(/👤/g, "") : "",
-    tags: tags,
-    attributes: {}
-  };
-}
-
-function parseLines(src: string): Ticket[] {
-  return src.split("\n").map(parseLine);
-}
+import { Ticket, parseLines } from "./data";
 
 let source = `タスク1 2018-01-01 2018-01-03 👤yamada ⏰2018-01-02
 タスク2 2018-01-02 2018-01-05
@@ -95,7 +72,7 @@ export default Vue.extend({
 
 <style src="codemirror/lib/codemirror.css"></style>
 <style src="codemirror/theme/monokai.css"></style>
-<style scoped>
+<style>
 .editor {
   width: 100%;
   height: 10rem;

@@ -2,7 +2,7 @@
   <div>
     <h1>ガントチャート</h1>
     <svg width="300" height="300">
-      <ViewGanttLine v-for="(ticket, index) in tickets" :ticket="ticket" :index="index" :key="index" :svg-width="svgWidth" :time-range="timeRange"></ViewGanttLine>
+      <ViewGanttLine v-for="(ticket, index) in tickets" :ticket="ticket" :index="index" :key="index" :options="options"></ViewGanttLine>
     </svg>
   </div>
 </template>
@@ -21,11 +21,13 @@ export default Vue.extend({
   },
   data() {
     return {
-      svgWidth: 600,
-      timeRange: [
-        new Date(2018, 0, 1).getTime(),
-        new Date(2018, 0, 20).getTime()
-      ]
+      options: {
+        svgWidth: 600,
+        timeRange: [
+          new Date(2018, 0, 1).getTime(),
+          new Date(2018, 0, 20).getTime()
+        ]
+      }
     };
   },
   methods: {}
