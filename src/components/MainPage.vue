@@ -1,20 +1,19 @@
 <template>
   <div class="hello">
-    <div>
-      ticketdown - prototype
-    </div>
-    <code-mirror ref="editor" v-model="source" :options="options">
-    </code-mirror>    
-    <div>
       <select v-model="mode">
         <option value="ViewCalendar">calendar</option>
         <option value="ViewGantt">gantt</option>
         <option value="ViewIssue">issue</option>
         <option>board</option>
       </select>
+
+    <div class="view">
+      <component :is="mode" :tickets="tickets"></component>
+
     </div>
 
-    <component :is="mode" :tickets="tickets"></component>
+    <code-mirror ref="editor" v-model="source" :options="options">
+    </code-mirror>    
   </div>
 </template>
 
@@ -77,15 +76,13 @@ export default Vue.extend({
   width: 100%;
   height: 10rem;
 }
+body,
+html {
+  height: 100%;
+}
 
 body {
   background: #999;
-}
-
-.hello {
-  margin: 1rem;
-  padding: 1rem;
-  background: white;
 }
 
 .gantt__line {
@@ -97,6 +94,13 @@ body {
   padding: 0.5rem;
 }
 
+.view {
+  flex: 1;
+  padding: 1rem;
+  background: white;
+  overflow-y: scroll;
+}
+
 .tag {
   background: #66a585;
   color: white;
@@ -104,5 +108,14 @@ body {
   padding: 0rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
+}
+
+.hello {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+#app {
+  height: 100%;
 }
 </style>
